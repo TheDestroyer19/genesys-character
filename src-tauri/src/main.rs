@@ -15,10 +15,6 @@ fn main() {
     pretty_env_logger::init();
 
     tauri::Builder::default()
-        .setup(|app| {
-            window::open_or_focus_character(app)?;
-            Ok(())
-        })
         .manage(WorldState::new(Entities::default()))
         .menu(menu::build())
         .on_menu_event(menu::on_menu_event)

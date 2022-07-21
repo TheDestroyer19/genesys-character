@@ -1,23 +1,24 @@
 use std::collections::HashMap;
 
 use log::info;
-use tauri::{command, State, generate_handler, Invoke, Runtime};
+use tauri::{command, State, generate_handler, Invoke};
 
 use crate::{state::{Entity, WorldState}, id::Id};
 
-pub(crate) fn commands<R>() -> impl Fn(Invoke<R>) + Send + Sync + 'static
-where R: Runtime {
+pub(crate) fn commands() -> impl Fn(Invoke) {
     generate_handler![get_entities, create_entity]
 }
 
 #[command]
-fn get_entities(entities: State<WorldState>) -> HashMap<Id, Entity> {
+fn get_entities(world: State<WorldState>) -> HashMap<Id, Entity> {
     info!("Fetching all entities");
-    entities.lock().unwrap().elements.clone()
+    world.lock().unwrap().elements.clone()
 }
 
-#[command]
-fn create_entity(entities: State<WorldState>) -> Entity {
+#[tauri::command]
+fn create_entity(world: State<WorldState>, window: tauri::Window) -> Entity {
     info!("Creating entity");
-    entities.lock().unwrap().create()
+    let entity = world.lock().unwrap().create();
+    crate::window::open_or_focus_editor(&window, entity.id).unwrap();
+    entity
 }

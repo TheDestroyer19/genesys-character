@@ -12,8 +12,7 @@ pub fn build() -> Menu {
     let view = Submenu::new(
         "View",
         Menu::new()
-          .add_item(CustomMenuItem::new("view-character", "Character Sheet"))
-          .add_item(CustomMenuItem::new("test-editor", "Test editor")),
+          .add_item(CustomMenuItem::new("view-character", "Character Sheet")),
     );
 
     Menu::new().add_submenu(file).add_submenu(view)
@@ -37,9 +36,6 @@ pub fn on_menu_event(event: WindowMenuEvent) {
         }
         "view-character" => {
             crate::window::open_or_focus_character(window).unwrap();
-        }
-        "test-editor" => {
-          crate::window::open_or_focus_editor(window).unwrap();
         }
         other => warn!("Unhandled menu event id: {}", other),
     };
