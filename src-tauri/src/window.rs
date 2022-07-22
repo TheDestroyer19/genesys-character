@@ -47,9 +47,9 @@ where
             &label,
             tauri::WindowUrl::App(format!("edit-item.html?id={}", id).into()),
         )
-        .title("Edit")
+        .title(format!("Edit {:?}", id))
         .fullscreen(false)
-        .inner_size(800., 600.)
+        .inner_size(400., 300.)
         .resizable(true)
         .build()
     }
