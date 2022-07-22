@@ -6,10 +6,11 @@
 use state::{Entities, WorldState};
 
 mod command;
-mod menu;
-mod window;
-mod state;
+mod event;
 mod id;
+mod menu;
+mod state;
+mod window;
 
 fn main() {
     pretty_env_logger::init();

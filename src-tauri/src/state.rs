@@ -1,6 +1,6 @@
 use std::{collections::HashMap, sync::Mutex};
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::id::Id;
 

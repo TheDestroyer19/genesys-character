@@ -6,9 +6,7 @@ pub(crate) const CHARACTER_WINDOW: &str = "character";
 pub(crate) const EDITOR_WINDOW_PREFIX: &str = "edit";
 
 /// Creates or raises the character window
-pub(crate) fn open_or_focus_character<M, R>(
-    manager: &M,
-) -> Result<tauri::Window<R>, tauri::Error>
+pub(crate) fn open_or_focus_character<M, R>(manager: &M) -> Result<tauri::Window<R>, tauri::Error>
 where
     M: Manager<R>,
     R: tauri::Runtime,
@@ -47,7 +45,7 @@ where
         WindowBuilder::new(
             manager,
             &label,
-            tauri::WindowUrl::App(format!("edit-item.html?id={}",id).into()),
+            tauri::WindowUrl::App(format!("edit-item.html?id={}", id).into()),
         )
         .title("Edit")
         .fullscreen(false)

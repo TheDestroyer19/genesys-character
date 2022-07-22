@@ -11,8 +11,7 @@ pub fn build() -> Menu {
 
     let view = Submenu::new(
         "View",
-        Menu::new()
-          .add_item(CustomMenuItem::new("view-character", "Character Sheet")),
+        Menu::new().add_item(CustomMenuItem::new("view-character", "Character Sheet")),
     );
 
     Menu::new().add_submenu(file).add_submenu(view)

@@ -1,6 +1,9 @@
-use std::{sync::atomic::{AtomicUsize, Ordering}, fmt::Display};
+use std::{
+    fmt::Display,
+    sync::atomic::{AtomicUsize, Ordering},
+};
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 static NEXT_ID: AtomicUsize = AtomicUsize::new(1);
 

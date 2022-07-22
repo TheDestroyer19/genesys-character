@@ -3,11 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="color-scheme" content="dark light">
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="stylesheet" href="src/css/shared.css" />
     <title>Vite + TS</title>
   </head>
   <body>
-    Hi this would be an editor window
+    <div class="hidden">
+      <label for="name-input">Name:</label>
+      <input type="text" id="name-input" />
+    </div>
+    <script type="module" src="src/edit-item"></script>
   </body>
 </html>
