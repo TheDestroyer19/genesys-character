@@ -21,6 +21,10 @@ export async function CreateEntity(): Promise<Entity> {
     return await invoke('create_entity');
 }
 
+export async function EditEntity(id: Id) {
+    return await invoke('edit_entity', { id: id });
+}
+
 export async function UpdateEntity(entity: Entity) {
     await invoke('update_entity', { entity: entity });
 }

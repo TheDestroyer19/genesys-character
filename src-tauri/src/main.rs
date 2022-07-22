@@ -3,7 +3,9 @@
     windows_subsystem = "windows"
 )]
 
-use state::{Entities, WorldState};
+use std::sync::Mutex;
+
+use state::World;
 
 mod command;
 mod event;
@@ -16,7 +18,7 @@ fn main() {
     pretty_env_logger::init();
 
     tauri::Builder::default()
-        .manage(WorldState::new(Entities::default()))
+        .manage(Mutex::new(World::default()))
         .menu(menu::build())
         .on_menu_event(menu::on_menu_event)
         .invoke_handler(command::commands())

@@ -4,14 +4,14 @@ use serde::{Deserialize, Serialize};
 
 use crate::id::Id;
 
-pub(crate) type WorldState = Mutex<Entities>;
+pub(crate) type WorldState<'r> = tauri::State<'r, Mutex<World>>;
 
 #[derive(Default)]
-pub(crate) struct Entities {
+pub(crate) struct World {
     pub elements: HashMap<Id, Entity>,
 }
 
-impl Entities {
+impl World {
     pub fn create(&mut self) -> Entity {
         let entity = Entity {
             id: Id::new(),
@@ -19,6 +19,10 @@ impl Entities {
         };
         self.elements.insert(entity.id, entity.clone());
         entity
+    }
+
+    pub fn contains(&self, id: Id) -> bool {
+        self.elements.contains_key(&id)
     }
 }
 
