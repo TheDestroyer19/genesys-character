@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::id::Id;
 
-pub(crate) type WorldState<'r> = tauri::State<'r, Mutex<World>>;
+pub(crate) type WorldState = Mutex<World>;
 
 #[derive(Default)]
 pub(crate) struct World {
@@ -23,6 +23,14 @@ impl World {
 
     pub fn contains(&self, id: Id) -> bool {
         self.elements.contains_key(&id)
+    }
+
+    pub fn get(&self, id: Id) -> Option<&Entity> {
+        self.elements.get(&id)
+    }
+
+    pub fn delete(&mut self, id: Id) {
+        self.elements.remove(&id);
     }
 }
 

@@ -1,4 +1,4 @@
-import { Entity, GetEntity, UpdateEntity } from "./rs-api";
+import { Entity, GetEntity, UpdateEntity, DeleteEntity } from "./rs-api";
 
 const NameInput = document.getElementById('name-input') as HTMLInputElement;
 
@@ -25,3 +25,5 @@ document.addEventListener('change', _event => {
     openEntity.name = NameInput.value;
     UpdateEntity(openEntity);
 })
+
+document.getElementById('delete')?.addEventListener('click', _ => DeleteEntity(ID));

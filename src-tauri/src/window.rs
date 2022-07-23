@@ -1,9 +1,28 @@
+use std::convert::Infallible;
+
+use log::error;
 use tauri::{Manager, WindowBuilder};
 
 use crate::id::Id;
 
 pub(crate) const CHARACTER_WINDOW: &str = "character";
 pub(crate) const EDITOR_WINDOW_PREFIX: &str = "edit";
+
+pub(crate) fn setup(app: &mut tauri::App) -> Result<(), Infallible> {
+    let manager = app.handle();
+
+    //Close editor windows when their associated entity is deleted
+    crate::event::listen_entity_deleted(app, move |id| {
+        let window = manager.get_window(&format!("{}-{}", EDITOR_WINDOW_PREFIX, id));
+        if let Some(window) = window {
+            if let Err(e) = window.close() {
+                error!("Failed to close a window: {}", e);
+            }
+        }
+    });
+
+    Ok(())
+}
 
 /// Creates or raises the character window
 pub(crate) fn open_or_focus_character<M, R>(manager: &M) -> Result<tauri::Window<R>, tauri::Error>

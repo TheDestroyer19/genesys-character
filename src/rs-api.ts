@@ -22,13 +22,21 @@ export async function CreateEntity(): Promise<Entity> {
 }
 
 export async function EditEntity(id: Id) {
-    return await invoke('edit_entity', { id: id });
+    await invoke('edit_entity', { id: id });
 }
 
 export async function UpdateEntity(entity: Entity) {
     await invoke('update_entity', { entity: entity });
 }
 
+export async function DeleteEntity(id: Id) {
+    await invoke('delete_entity', { id: id });
+}
+
 export async function ListenForElementUpdated(callback: EventCallback<Entity>): Promise<UnlistenFn> {
     return await listen('entity-updated', callback);
+}
+
+export async function ListenForElementDeleted(callback: EventCallback<Id>): Promise<UnlistenFn> {
+    return await listen('entity-deleted', callback);
 }

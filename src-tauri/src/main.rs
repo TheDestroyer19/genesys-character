@@ -18,6 +18,10 @@ fn main() {
     pretty_env_logger::init();
 
     tauri::Builder::default()
+        .setup(|app| {
+            window::setup(app)?;
+            Ok(())
+        })
         .manage(Mutex::new(World::default()))
         .menu(menu::build())
         .on_menu_event(menu::on_menu_event)
