@@ -1,4 +1,8 @@
+use std::any::type_name;
+
 use log::{error, info};
+use serde::Serialize;
+use serde::de::DeserializeOwned;
 use tauri::{EventHandler, Manager, Runtime};
 
 use crate::{id::Id, state::Entity};
@@ -11,10 +15,18 @@ where
     M: Manager<R> + Sized,
     R: Runtime,
 {
-    info!("Sending '{}'", ENTITY_UPDATED);
-    let data = serde_json::to_string(&entity)?;
-    manager.trigger_global(ENTITY_UPDATED, Some(data));
-    manager.emit_all(ENTITY_UPDATED, entity)
+    send(manager, ENTITY_UPDATED, entity)
+}
+
+pub(crate) fn listen_entity_updated<M, R>(
+    manager: &M,
+    handler: impl Fn(Entity) -> () + Send + 'static,
+) -> EventHandler
+where
+    M: Manager<R> + Sized,
+    R: Runtime,
+{
+    listen(manager, ENTITY_UPDATED, handler)
 }
 
 pub(crate) fn send_entity_deleted<M, R>(manager: &M, id: Id) -> Result<(), tauri::Error>
@@ -22,10 +34,7 @@ where
     M: Manager<R> + Sized,
     R: Runtime,
 {
-    info!("Sending '{}'", ENTITY_DELETED);
-    let data = serde_json::to_string(&id)?;
-    manager.trigger_global(ENTITY_DELETED, Some(data));
-    manager.emit_all(ENTITY_DELETED, id)
+    send(manager, ENTITY_DELETED, id)
 }
 
 pub(crate) fn listen_entity_deleted<M, R>(
@@ -36,14 +45,35 @@ where
     M: Manager<R> + Sized,
     R: Runtime,
 {
-    manager.listen_global(ENTITY_DELETED, move |event| {
-        info!("'{}' was received", ENTITY_DELETED);
+    listen(manager, ENTITY_DELETED, handler)
+}
+
+fn send<P, M, R>(manager: &M, event_type: &'static str, payload: P) -> Result<(), tauri::Error>
+ where P: Serialize + Clone, M: Manager<R>, R: Runtime {
+    info!("Sending '{}'", event_type);
+    let data = serde_json::to_string(&payload)?;
+    manager.trigger_global(event_type, Some(data));
+    manager.emit_all(event_type, payload)
+}
+
+fn listen<P, M, R>(
+    manager: &M,
+    event_type: &'static str,
+    handler: impl Fn(P) -> () + Send + 'static
+) -> EventHandler
+where 
+    P: DeserializeOwned,
+    M: Manager<R> + Sized,
+    R: Runtime,
+{
+    manager.listen_global(event_type, move | event| {
+        info!("'{}' was received", event_type);
         let payload = match event.payload() {
             Some(s) => s,
             None => {
                 error!(
                     "'{}' event missing payload - it should be an Id",
-                    ENTITY_DELETED
+                    event_type
                 );
                 return;
             }
@@ -52,8 +82,8 @@ where
         match serde_json::from_str(payload) {
             Ok(id) => handler(id),
             Err(e) => error!(
-                "'{}' event failed to parse payload - it should be an Id\n{}",
-                ENTITY_DELETED, e
+                "'{}' event failed to parse payload - it should be an {}\n{}",
+                event_type, type_name::<P>(), e
             ),
         }
     })

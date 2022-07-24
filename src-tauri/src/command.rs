@@ -25,7 +25,7 @@ pub(crate) fn commands() -> impl Fn(Invoke) {
 fn create_entity(world: State<WorldState>, window: tauri::Window) -> Entity {
     info!("Creating entity");
     let entity = world.lock().unwrap().create();
-    crate::window::open_or_focus_editor(&window, entity.id).unwrap();
+    crate::window::open_or_focus_editor(&window, &entity).unwrap();
     entity
 }
 
@@ -45,8 +45,8 @@ fn get_entity(world: State<WorldState>, id: Id) -> Option<Entity> {
 fn edit_entity(window: tauri::Window, world: State<WorldState>, id: Id) {
     info!("Opening editor for entity {:?}", id);
     let world = world.lock().unwrap();
-    if world.contains(id) {
-        crate::window::open_or_focus_editor(&window, id).unwrap();
+    if let Some(entity) = world.get(id) {
+        crate::window::open_or_focus_editor(&window, entity).unwrap();
     } else {
         warn!("Cannot open editor for nonexistant entity {:?}", id);
     }
@@ -71,20 +71,14 @@ fn delete_entity(window: tauri::Window, world: State<WorldState>, id: Id) {
             Some(entity) => entity,
             None => return,
         };
-        if let Some(name) = entity.name.as_ref() {
-            (
-                format!("Deleting {}", name),
-                format!(
-                    "Are you sure you want to delete {}?\nIt will be gone forever",
-                    name
-                ),
-            )
-        } else {
-            (
-                "Deleting".to_string(),
-                "Are you sure you want to delete this?\nIt will be gone forever".to_string(),
-            )
-        }
+
+        (
+            format!("Deleting {}", entity.name),
+            format!(
+                "Are you sure you want to delete {}?\nIt will be gone forever",
+                entity.name
+            ),
+        )
     };
 
     dialog::confirm(Some(&window.clone()), title, message, move |confirmed| {

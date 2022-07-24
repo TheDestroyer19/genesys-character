@@ -3,15 +3,25 @@ use std::convert::Infallible;
 use log::error;
 use tauri::{Manager, WindowBuilder};
 
-use crate::id::Id;
+use crate::state::Entity;
 
 pub(crate) const CHARACTER_WINDOW: &str = "character";
 pub(crate) const EDITOR_WINDOW_PREFIX: &str = "edit";
 
 pub(crate) fn setup(app: &mut tauri::App) -> Result<(), Infallible> {
+    //Update editor window titles when their entity updates
     let manager = app.handle();
+    crate::event::listen_entity_updated(app, move |entity| {
+        let window = manager.get_window(&format!("{}-{}", EDITOR_WINDOW_PREFIX, entity.id));
+        if let Some(window) = window {
+            if let Err(e) = window.set_title(&format!("Edit {}", entity.name)) {
+                error!("Failed to update window title: {}", e);
+            }
+        }
+    });
 
     //Close editor windows when their associated entity is deleted
+    let manager = app.handle();
     crate::event::listen_entity_deleted(app, move |id| {
         let window = manager.get_window(&format!("{}-{}", EDITOR_WINDOW_PREFIX, id));
         if let Some(window) = window {
@@ -50,13 +60,13 @@ where
 /// Creates or focuses an editor window
 pub(crate) fn open_or_focus_editor<M, R>(
     manager: &M,
-    id: Id,
+    entity: &Entity,
 ) -> Result<tauri::Window<R>, tauri::Error>
 where
     M: Manager<R>,
     R: tauri::Runtime,
 {
-    let label = format!("{}-{}", EDITOR_WINDOW_PREFIX, id);
+    let label = format!("{}-{}", EDITOR_WINDOW_PREFIX, entity.id);
     if let Some(window) = manager.windows().get(&label) {
         window.set_focus()?;
         Ok(window.clone())
@@ -64,9 +74,9 @@ where
         WindowBuilder::new(
             manager,
             &label,
-            tauri::WindowUrl::App(format!("edit-item.html?id={}", id).into()),
+            tauri::WindowUrl::App(format!("edit-item.html?id={}", entity.id).into()),
         )
-        .title(format!("Edit {:?}", id))
+        .title(format!("Edit {}", entity.name))
         .fullscreen(false)
         .inner_size(400., 300.)
         .resizable(true)
