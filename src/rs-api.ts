@@ -5,11 +5,11 @@ export type Id = number;
 export interface Entity {
     id: Id,
     name: string,
+    description: string,
 };
 
-export async function GetEntities(): Promise<Map<Id, Entity>> {
-    const raw = await invoke('get_entities') as any;
-    return new Map(Object.entries(raw).map(kv => [parseInt(kv[0]), kv[1] as Entity]));
+export async function GetEntities(): Promise<Entity[]> {
+    return await invoke('get_entities');
 }
 
 export async function GetEntity(id: Id): Promise<Entity> {

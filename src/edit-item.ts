@@ -1,6 +1,7 @@
 import { Entity, GetEntity, UpdateEntity, DeleteEntity } from "./rs-api";
 
 const NameInput = document.getElementById('name-input') as HTMLInputElement;
+const DescInput = document.getElementById('description-input') as HTMLTextAreaElement;
 
 const ID = parseInt(new URLSearchParams(location.search).get('id') as string);
 
@@ -9,10 +10,8 @@ var openEntity: Entity | null = null;
 GetEntity(ID).then(entity => {
     openEntity = entity;
 
-    if (entity.name !== null) {
-        NameInput.value = entity.name;
-        NameInput.parentElement?.classList?.remove('hidden');
-    }
+    NameInput.value = entity.name;
+    DescInput.value = entity.description;
 });
 
 //setup event handling
@@ -23,6 +22,7 @@ document.addEventListener('change', _event => {
     }
 
     openEntity.name = NameInput.value;
+    openEntity.description = DescInput.value;
     UpdateEntity(openEntity);
 })
 

@@ -1,3 +1,78 @@
+@import "open-props/style";
+@import "open-props/normalize";
+
+html {
+    --accent-0: var(--blue-0);
+    --accent-1: var(--blue-1);
+    --accent-2: var(--blue-2);
+    --accent-3: var(--blue-3);
+    --accent-4: var(--blue-4);
+    --accent-5: var(--blue-5);
+    --accent-6: var(--blue-6);
+    --accent-7: var(--blue-7);
+    --accent-8: var(--blue-8);
+    --accent-9: var(--blue-9);
+}
+
+.red-accent {
+    --accent-0: var(--red-0);
+    --accent-1: var(--red-1);
+    --accent-2: var(--red-2);
+    --accent-3: var(--red-3);
+    --accent-4: var(--red-4);
+    --accent-5: var(--red-5);
+    --accent-6: var(--red-6);
+    --accent-7: var(--red-7);
+    --accent-8: var(--red-8);
+    --accent-9: var(--red-9);
+}
+
 .hidden {
     display: none;
+}
+
+.two-column-form {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--size-1);
+    padding: var(--size-1)
+}
+
+.two-column-form label {
+    justify-self: end;
+}
+
+.two-column-form textarea {
+    resize: vertical;
+}
+
+/*-----------------------------------------------------------------------------
+  Button
+-----------------------------------------------------------------------------*/
+
+button {
+    display: inline-flex;
+    white-space: nowrap;
+
+    font-size: var(--font-size-1);
+    font-weight: var(--font-weight-7);
+
+    padding-left: var(--size-1);
+    padding-right: var(--size-1);
+    padding-top: var(--size-0);
+    padding-bottom: var(--size-0);
+    border-radius: var(--radius-2);
+  
+    color: var(--accent-0);
+    background-color: var(--accent-8);
+}
+
+button:is(:hover, :focus) {
+    cursor: pointer;
+    color: var(--accent-0);
+    background-color: var(--accent-5);
+}
+
+button:active:not(.focus-visible) {
+    position: relative;
 }

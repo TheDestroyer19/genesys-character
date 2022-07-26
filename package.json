@@ -16,6 +16,6 @@
   },
   "dependencies": {
     "@tauri-apps/api": "^1.0.2",
-    "tauri": "^0.14.1"
+    "open-props": "^1.4.4"
   }
 }

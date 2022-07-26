@@ -1,6 +1,4 @@
-use std::collections::HashMap;
-
-use log::{info, warn, error};
+use log::{error, info, warn};
 use tauri::{api::dialog, command, generate_handler, Invoke, Manager, State};
 
 use crate::event::{EntityDeleted, EntityUpdated, Event};
@@ -29,15 +27,15 @@ fn create_entity(world: State<WorldState>, window: tauri::Window) {
 }
 
 #[command]
-fn get_entities(world: State<WorldState>) -> HashMap<Id, Entity> {
+fn get_entities(world: State<WorldState>) -> Vec<Entity> {
     info!("Fetching all entities");
-    world.lock().unwrap().elements.clone()
+    world.lock().unwrap().get_all().cloned().collect()
 }
 
 #[command]
 fn get_entity(world: State<WorldState>, id: Id) -> Option<Entity> {
     info!("Fetching entity {:?}", id);
-    world.lock().unwrap().elements.get(&id).cloned()
+    world.lock().unwrap().get(id).cloned()
 }
 
 #[command]
@@ -54,11 +52,14 @@ fn edit_entity(window: tauri::Window, world: State<WorldState>, id: Id) {
 #[command]
 fn update_entity(window: tauri::Window, world: State<WorldState>, entity: Entity) {
     info!("Updating entity {:?}", entity.id);
-    if let Some(old_e) = world.lock().unwrap().elements.get_mut(&entity.id) {
-        *old_e = entity;
-        EntityUpdated::send(&window, old_e).unwrap();
-    } else {
-        warn!("Tried to update nonexistant entity {:?}", entity.id);
+    let result = world
+        .lock()
+        .unwrap()
+        .update(entity)
+        .and_then(|e| EntityUpdated::send(&window, e));
+
+    if let Err(e) = result {
+        error!("Failed to update entity: {}", e)
     }
 }
 

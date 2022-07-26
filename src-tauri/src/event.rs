@@ -1,5 +1,6 @@
 use std::any::type_name;
 
+use anyhow::Context;
 use log::{error, info};
 use serde::de::DeserializeOwned;
 use serde::Serialize;
@@ -35,12 +36,15 @@ where
             }
         })
     }
-    fn send(manager: &M, payload: &Self::Payload) -> Result<(), tauri::Error> {
+    fn send(manager: &M, payload: &Self::Payload) -> Result<(), anyhow::Error> {
         let name = Self::name();
         info!("Sending '{name}'");
-        let data = serde_json::to_string(&payload)?;
+        let data = serde_json::to_string(&payload)
+            .with_context(|| format!("Failed to serialize event {} payload", name))?;
         manager.trigger_global(name, Some(data));
-        manager.emit_all(name, payload)
+        manager
+            .emit_all(name, payload)
+            .with_context(|| format!("Failed to send event {}", name))
     }
 }
 
@@ -67,4 +71,3 @@ impl<M: Manager<R>, R: Runtime> Event<M, R> for EntityDeleted {
         "entity-deleted"
     }
 }
-

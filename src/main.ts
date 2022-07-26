@@ -8,12 +8,15 @@ function CreateDisplay(entity: Entity) {
   edit.classList.add('edit-btn');
   edit.textContent = 'Edit';
 
-  const text = document.createElement('span');
-  text.textContent = entity.id + ": " + entity.name;
+  const name = document.createElement('b');
+  name.textContent = entity.id + ": " + entity.name;
+
+  const description = document.createElement('span');
+  description.textContent = entity.description;
 
   const element = document.createElement('li');
   element.setAttribute('data-entity', entity.id.toString());
-  element.append(text, edit);
+  element.append(name, edit, document.createElement('br'), description);
 
   list.append(element);
 }
@@ -35,9 +38,13 @@ ListenForEntityCreated(event => {
 ListenForEntityUpdated(event => {
   let entity = event.payload;
   document.querySelectorAll(`[data-entity="${entity.id}"]`).forEach(element => {
-    let text = element.querySelector('span');
+    let text = element.querySelector('b');
     if (text !== null) {
       text.textContent = entity.id + ": " + entity.name;
+    }
+    let desc = element.querySelector('span');
+    if (desc !== null) {
+      desc.textContent = entity.description;
     }
   });
 });
