@@ -1,90 +1,61 @@
 use std::any::type_name;
 
 use log::{error, info};
-use serde::Serialize;
 use serde::de::DeserializeOwned;
+use serde::Serialize;
 use tauri::{EventHandler, Manager, Runtime};
 
 use crate::{id::Id, state::Entity};
 
-const ENTITY_UPDATED: &str = "entity-updated";
-const ENTITY_DELETED: &str = "entity-deleted";
-
-pub(crate) fn send_entity_updated<M, R>(manager: &M, entity: &Entity) -> Result<(), tauri::Error>
+pub(crate) trait Event<M, R>
 where
     M: Manager<R> + Sized,
     R: Runtime,
 {
-    send(manager, ENTITY_UPDATED, entity)
-}
+    type Payload: Serialize + DeserializeOwned + Clone;
+    fn name() -> &'static str;
+    fn listen(manager: &M, handler: impl Fn(Self::Payload) -> () + Send + 'static) -> EventHandler {
+        let name = Self::name();
+        let type_name = type_name::<Self::Payload>();
+        manager.listen_global(name, move |event| {
+            info!("'{name}' was received");
+            let payload = match event.payload() {
+                Some(s) => s,
+                None => {
+                    error!("'{name}' event missing payload - it should be an {type_name}");
+                    return;
+                }
+            };
 
-pub(crate) fn listen_entity_updated<M, R>(
-    manager: &M,
-    handler: impl Fn(Entity) -> () + Send + 'static,
-) -> EventHandler
-where
-    M: Manager<R> + Sized,
-    R: Runtime,
-{
-    listen(manager, ENTITY_UPDATED, handler)
-}
-
-pub(crate) fn send_entity_deleted<M, R>(manager: &M, id: Id) -> Result<(), tauri::Error>
-where
-    M: Manager<R> + Sized,
-    R: Runtime,
-{
-    send(manager, ENTITY_DELETED, id)
-}
-
-pub(crate) fn listen_entity_deleted<M, R>(
-    manager: &M,
-    handler: impl Fn(Id) -> () + Send + 'static,
-) -> EventHandler
-where
-    M: Manager<R> + Sized,
-    R: Runtime,
-{
-    listen(manager, ENTITY_DELETED, handler)
-}
-
-fn send<P, M, R>(manager: &M, event_type: &'static str, payload: P) -> Result<(), tauri::Error>
- where P: Serialize + Clone, M: Manager<R>, R: Runtime {
-    info!("Sending '{}'", event_type);
-    let data = serde_json::to_string(&payload)?;
-    manager.trigger_global(event_type, Some(data));
-    manager.emit_all(event_type, payload)
-}
-
-fn listen<P, M, R>(
-    manager: &M,
-    event_type: &'static str,
-    handler: impl Fn(P) -> () + Send + 'static
-) -> EventHandler
-where 
-    P: DeserializeOwned,
-    M: Manager<R> + Sized,
-    R: Runtime,
-{
-    manager.listen_global(event_type, move | event| {
-        info!("'{}' was received", event_type);
-        let payload = match event.payload() {
-            Some(s) => s,
-            None => {
-                error!(
-                    "'{}' event missing payload - it should be an Id",
-                    event_type
-                );
-                return;
+            match serde_json::from_str(payload) {
+                Ok(id) => handler(id),
+                Err(e) => error!(
+                    "'{name}' event failed to parse payload - it should be an {type_name}\n{e}"
+                ),
             }
-        };
+        })
+    }
+    fn send(manager: &M, payload: &Self::Payload) -> Result<(), tauri::Error> {
+        let name = Self::name();
+        info!("Sending '{name}'");
+        let data = serde_json::to_string(&payload)?;
+        manager.trigger_global(name, Some(data));
+        manager.emit_all(name, payload)
+    }
+}
 
-        match serde_json::from_str(payload) {
-            Ok(id) => handler(id),
-            Err(e) => error!(
-                "'{}' event failed to parse payload - it should be an {}\n{}",
-                event_type, type_name::<P>(), e
-            ),
-        }
-    })
+pub(crate) struct EntityUpdated;
+impl<M: Manager<R>, R: Runtime> Event<M, R> for EntityUpdated {
+    type Payload = Entity;
+
+    fn name() -> &'static str {
+        "entity-updated"
+    }
+}
+pub(crate) struct EntityDeleted;
+impl<M: Manager<R>, R: Runtime> Event<M, R> for EntityDeleted {
+    type Payload = Id;
+    fn name() -> &'static str {
+        "entity-deleted"
+    }
 }

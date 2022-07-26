@@ -3,6 +3,7 @@ use std::convert::Infallible;
 use log::error;
 use tauri::{Manager, WindowBuilder};
 
+use crate::event::Event;
 use crate::state::Entity;
 
 pub(crate) const CHARACTER_WINDOW: &str = "character";
@@ -11,7 +12,7 @@ pub(crate) const EDITOR_WINDOW_PREFIX: &str = "edit";
 pub(crate) fn setup(app: &mut tauri::App) -> Result<(), Infallible> {
     //Update editor window titles when their entity updates
     let manager = app.handle();
-    crate::event::listen_entity_updated(app, move |entity| {
+    crate::event::EntityUpdated::listen(app, move |entity| {
         let window = manager.get_window(&format!("{}-{}", EDITOR_WINDOW_PREFIX, entity.id));
         if let Some(window) = window {
             if let Err(e) = window.set_title(&format!("Edit {}", entity.name)) {
@@ -22,7 +23,7 @@ pub(crate) fn setup(app: &mut tauri::App) -> Result<(), Infallible> {
 
     //Close editor windows when their associated entity is deleted
     let manager = app.handle();
-    crate::event::listen_entity_deleted(app, move |id| {
+    crate::event::EntityDeleted::listen(app, move |id| {
         let window = manager.get_window(&format!("{}-{}", EDITOR_WINDOW_PREFIX, id));
         if let Some(window) = window {
             if let Err(e) = window.close() {

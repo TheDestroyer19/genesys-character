@@ -3,12 +3,9 @@ use std::collections::HashMap;
 use log::{info, warn};
 use tauri::{api::dialog, command, generate_handler, Invoke, Manager, State};
 
-use crate::{
-    event::send_entity_deleted,
-    event::send_entity_updated,
-    id::Id,
-    state::{Entity, WorldState},
-};
+use crate::event::{EntityDeleted, EntityUpdated, Event};
+use crate::id::Id;
+use crate::state::{Entity, WorldState};
 
 pub(crate) fn commands() -> impl Fn(Invoke) {
     generate_handler![
@@ -57,7 +54,7 @@ fn update_entity(window: tauri::Window, world: State<WorldState>, entity: Entity
     info!("Updating entity {:?}", entity.id);
     if let Some(old_e) = world.lock().unwrap().elements.get_mut(&entity.id) {
         *old_e = entity;
-        send_entity_updated(&window, old_e).unwrap();
+        EntityUpdated::send(&window, old_e).unwrap();
     } else {
         warn!("Tried to update nonexistant entity {:?}", entity.id);
     }
@@ -85,7 +82,7 @@ fn delete_entity(window: tauri::Window, world: State<WorldState>, id: Id) {
         if confirmed {
             let world = window.state::<WorldState>();
             world.lock().unwrap().delete(id);
-            send_entity_deleted(&window, id).unwrap();
+            EntityDeleted::send(&window, &id).unwrap();
         }
     })
 }
