@@ -4,7 +4,7 @@ import { EventCallback, listen, UnlistenFn } from '@tauri-apps/api/event';
 export type Id = number;
 export interface Entity {
     id: Id,
-    name: string | null,
+    name: string,
 };
 
 export async function GetEntities(): Promise<Map<Id, Entity>> {
@@ -17,7 +17,7 @@ export async function GetEntity(id: Id): Promise<Entity> {
     return raw as Entity;
 }
 
-export async function CreateEntity(): Promise<Entity> {
+export async function CreateEntity() {
     return await invoke('create_entity');
 }
 
@@ -33,10 +33,14 @@ export async function DeleteEntity(id: Id) {
     await invoke('delete_entity', { id: id });
 }
 
-export async function ListenForElementUpdated(callback: EventCallback<Entity>): Promise<UnlistenFn> {
+export async function ListenForEntityCreated(callback: EventCallback<Entity>): Promise<UnlistenFn> {
+    return await listen('entity-created', callback);
+}
+
+export async function ListenForEntityUpdated(callback: EventCallback<Entity>): Promise<UnlistenFn> {
     return await listen('entity-updated', callback);
 }
 
-export async function ListenForElementDeleted(callback: EventCallback<Id>): Promise<UnlistenFn> {
+export async function ListenForEntityDeleted(callback: EventCallback<Id>): Promise<UnlistenFn> {
     return await listen('entity-deleted', callback);
 }

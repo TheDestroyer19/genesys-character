@@ -44,14 +44,22 @@ where
     }
 }
 
+pub(crate) struct EntityCreated;
+impl<M: Manager<R>, R: Runtime> Event<M, R> for EntityCreated {
+    type Payload = Entity;
+    fn name() -> &'static str {
+        "entity-created"
+    }
+}
+
 pub(crate) struct EntityUpdated;
 impl<M: Manager<R>, R: Runtime> Event<M, R> for EntityUpdated {
     type Payload = Entity;
-
     fn name() -> &'static str {
         "entity-updated"
     }
 }
+
 pub(crate) struct EntityDeleted;
 impl<M: Manager<R>, R: Runtime> Event<M, R> for EntityDeleted {
     type Payload = Id;
@@ -59,3 +67,4 @@ impl<M: Manager<R>, R: Runtime> Event<M, R> for EntityDeleted {
         "entity-deleted"
     }
 }
+

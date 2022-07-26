@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use log::{info, warn};
+use log::{info, warn, error};
 use tauri::{api::dialog, command, generate_handler, Invoke, Manager, State};
 
 use crate::event::{EntityDeleted, EntityUpdated, Event};
@@ -19,11 +19,13 @@ pub(crate) fn commands() -> impl Fn(Invoke) {
 }
 
 #[command]
-fn create_entity(world: State<WorldState>, window: tauri::Window) -> Entity {
+fn create_entity(world: State<WorldState>, window: tauri::Window) {
     info!("Creating entity");
     let entity = world.lock().unwrap().create();
     crate::window::open_or_focus_editor(&window, &entity).unwrap();
-    entity
+    if let Err(e) = crate::event::EntityCreated::send(&window, &entity) {
+        error!("Failed to create entity: {}", e);
+    }
 }
 
 #[command]
@@ -62,6 +64,7 @@ fn update_entity(window: tauri::Window, world: State<WorldState>, entity: Entity
 
 #[command]
 fn delete_entity(window: tauri::Window, world: State<WorldState>, id: Id) {
+    info!("Deleting entity {:?}", id);
     let (title, message) = {
         let world = world.lock().unwrap();
         let entity = match world.get(id) {

@@ -1,4 +1,4 @@
-import { CreateEntity, EditEntity, Entity, GetEntities, ListenForElementDeleted, ListenForElementUpdated } from "./rs-api";
+import { CreateEntity, EditEntity, Entity, GetEntities, ListenForEntityCreated, ListenForEntityDeleted, ListenForEntityUpdated } from "./rs-api";
 
 const list = document.getElementById("list") as HTMLElement;//Assume that element exists
 const add_item = document.getElementById("new-entity") as HTMLElement;//Assume that element exists
@@ -24,10 +24,15 @@ GetEntities().then((entities) => {
 
 add_item.addEventListener('click', _ => {
   console.log("adding item");
-  CreateEntity().then(CreateDisplay);
+  CreateEntity();
 });
 
-ListenForElementUpdated(event => {
+ListenForEntityCreated(event => {
+  let entity = event.payload;
+  CreateDisplay(entity);
+})
+
+ListenForEntityUpdated(event => {
   let entity = event.payload;
   document.querySelectorAll(`[data-entity="${entity.id}"]`).forEach(element => {
     let text = element.querySelector('span');
@@ -37,7 +42,7 @@ ListenForElementUpdated(event => {
   });
 });
 
-ListenForElementDeleted(event => {
+ListenForEntityDeleted(event => {
   let id = event.payload;
   document.querySelectorAll(`[data-entity="${id}"]`).forEach(element => element.remove());
 });
