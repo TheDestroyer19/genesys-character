@@ -28,7 +28,11 @@ html {
 }
 
 .hidden {
-    display: none;
+    display: none !important;
+}
+
+.justify-right {
+    justify-self: end;
 }
 
 .two-column-form {
@@ -44,6 +48,11 @@ html {
 
 .two-column-form textarea {
     resize: vertical;
+}
+
+.horizontal-row {
+    display: flex;
+    justify-content: space-between;
 }
 
 /*-----------------------------------------------------------------------------

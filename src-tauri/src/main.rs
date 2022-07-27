@@ -22,7 +22,7 @@ fn main() {
             window::setup(app)?;
             Ok(())
         })
-        .manage(Mutex::new(World::default()))
+        .manage(Mutex::new(World::new()))
         .menu(menu::build())
         .on_menu_event(menu::on_menu_event)
         .invoke_handler(command::commands())

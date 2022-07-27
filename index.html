@@ -6,11 +6,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <link rel="stylesheet" href="src/css/shared.css" />
+    <link rel="stylesheet" href="src/css/index.css" />
     <title>Vite + TS</title>
   </head>
   <body>
-    <ul id="list"></ul>
-    <button id="new-entity">Add Item</button>
+    <section id="header">
+      <div class="horizontal-row">
+        <span id="name-span">
+          <button id="edit-header">Edit</button>
+          <h1 id="name"></h1>
+        </span>
+        <span>Player: <Span id="player"></Span></span>
+        <span>XP: <span id="xp"></span> / <span id="xp-total"></span></span>
+      </div>
+      <div class="horizontal-row">
+        <span>Species:<!--TODO add toggle to display as archetype or species--><span id="archetype"></span></span>
+        <span>Career: <span id="career"></span></span>
+        <span>Specializations:<span id="specializations"></span></span>
+      </div>
+    </section>
+    <section id="characteristics">
+      <div id="brawn">Brawn<div class="value"></div></div>
+      <div id="agility">Agility<div class="value"></div></div>
+      <div id="intellect">Intellect<div class="value"></div></div>
+      <div id="cunning">Cunning<div class="value"></div></div>
+      <div id="willpower">Willpower<div class="value"></div></div>
+      <div id="presence">Presence<div class="value"></div></div>
+      <div id="force-rank" class="hidden">
+        Force Rank
+        <span class="value"></span>
+      </div>
+    </section>
+    <section>
+      <h2>Other Entities</h2>
+      <div id="list"></div>
+      <button id="new-entity">Add Item</button>
+    </section>
     <script type="module" src="src/main"></script>
   </body>
 </html>

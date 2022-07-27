@@ -6,7 +6,36 @@ export interface Entity {
     id: Id,
     name: string,
     description: string,
+    character: Character | null,
 };
+
+export interface Character {
+    player: string,
+    archetype: string,
+    career: string,
+    specializations: string,
+    xp: number,
+    total_xp: number,
+
+    brawn: number,
+    agility: number,
+    intellect: number,
+    cunning: number,
+    willpower: number,
+    presence: number,
+    force_rank: number | null,
+
+    soak: number,
+    wounds: number,
+    wounds_threshold: number,
+    strain: number,
+    strain_threshold: number,
+    defense_melee: number,
+    defense_ranged: number,
+
+    encumbrance: number,
+    encumbrance_threshold: number,
+}
 
 export async function GetEntities(): Promise<Entity[]> {
     return await invoke('get_entities');
