@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="color-scheme" content="dark light">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="stylesheet" href="src/css/shared.css" />
+    <title>Vite + TS</title>
+  </head>
+  <body>
+    <div class="two-column-form">
+        <label for="name-input">Character Name:</label>
+        <input type="text" id="name-input" />
+        <label for="player-input">Player:</label>
+        <input type="text" id="player-input" />
+        <label for="xp">XP: </label>
+        <span class="horizontal-row">
+            <input id="xp" type="number" />
+             / 
+            <input id="total-xp" type="number" />
+        </span>
+        <label for="archetype">Archetype:</label>
+        <input id="archetype" type="text" />
+        <label for="career">Career:</label>
+        <input id="career" type="text" />
+        <label for="specializations">Specializations:</label>
+        <input id="specializations" type="text" />
+    </div>
+    <script type="module" src="src/edit-header"></script>
+  </body>
+</html>

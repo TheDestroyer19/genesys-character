@@ -4,6 +4,7 @@ use tauri::{api::dialog, command, generate_handler, Invoke, Manager, State};
 use crate::event::{EntityDeleted, EntityUpdated, Event};
 use crate::id::Id;
 use crate::state::{Entity, WorldState};
+use crate::window::Window;
 
 pub(crate) fn commands() -> impl Fn(Invoke) {
     generate_handler![
@@ -12,7 +13,9 @@ pub(crate) fn commands() -> impl Fn(Invoke) {
         get_entity,
         edit_entity,
         update_entity,
-        delete_entity
+        delete_entity,
+        get_character,
+        edit_character,
     ]
 }
 
@@ -20,7 +23,9 @@ pub(crate) fn commands() -> impl Fn(Invoke) {
 fn create_entity(world: State<WorldState>, window: tauri::Window) {
     info!("Creating entity");
     let entity = world.lock().unwrap().create();
-    crate::window::open_or_focus_editor(&window, &entity).unwrap();
+    crate::window::Edit(entity.id)
+        .open_or_focus(&window)
+        .unwrap();
     if let Err(e) = crate::event::EntityCreated::send(&window, &entity) {
         error!("Failed to create entity: {}", e);
     }
@@ -43,7 +48,9 @@ fn edit_entity(window: tauri::Window, world: State<WorldState>, id: Id) {
     info!("Opening editor for entity {:?}", id);
     let world = world.lock().unwrap();
     if let Some(entity) = world.get(id) {
-        crate::window::open_or_focus_editor(&window, entity).unwrap();
+        crate::window::Edit(entity.id)
+            .open_or_focus(&window)
+            .unwrap();
     } else {
         warn!("Cannot open editor for nonexistant entity {:?}", id);
     }
@@ -89,4 +96,17 @@ fn delete_entity(window: tauri::Window, world: State<WorldState>, id: Id) {
             EntityDeleted::send(&window, &id).unwrap();
         }
     })
+}
+
+#[command]
+fn get_character(world: State<WorldState>) -> Entity {
+    info!("Fetching Character");
+    let world = world.lock().unwrap();
+    world.get_character().clone()
+}
+
+#[command]
+fn edit_character(window: tauri::Window) {
+    info!("Opening character entity for editing");
+    crate::window::EditCharacter.open_or_focus(&window).unwrap();
 }

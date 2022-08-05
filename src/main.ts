@@ -1,7 +1,8 @@
-import { CreateEntity, EditEntity, Entity, GetEntities, ListenForEntityCreated, ListenForEntityDeleted, ListenForEntityUpdated } from "./rs-api";
+import { CreateEntity, EditCharacter, EditEntity, Entity, GetEntities, ListenForEntityCreated, ListenForEntityDeleted, ListenForEntityUpdated } from "./rs-api";
 
 const list = document.getElementById("list") as HTMLElement;//Assume that element exists
 const add_item = document.getElementById("new-entity") as HTMLElement;//Assume that element exists
+const edit_header = document.getElementById("edit-header") as HTMLElement;//Assume that element exists
 
 function CreateUnknownDisplay(entity: Entity) {
   const edit = document.createElement('button');
@@ -41,6 +42,7 @@ function UpdateCharacterDisplay(entity: Entity) {
   document.getElementById('name')!.textContent = entity.name;
   document.getElementById('xp')!.textContent = entity.character.xp.toString();
   document.getElementById('xp-total')!.textContent = entity.character.total_xp.toString();
+  document.getElementById('archetype')!.textContent = entity.character.archetype;
   document.getElementById('career')!.textContent = entity.character.career;
   document.getElementById('specializations')!.textContent = entity.character.specializations;
 
@@ -73,6 +75,11 @@ add_item.addEventListener('click', _ => {
   console.log("adding item");
   CreateEntity();
 });
+
+edit_header.addEventListener('click', _ => {
+  console.log("editing header");
+  EditCharacter();
+})
 
 ListenForEntityCreated(event => {
   let entity = event.payload;

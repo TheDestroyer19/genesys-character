@@ -53,6 +53,11 @@ html {
 .horizontal-row {
     display: flex;
     justify-content: space-between;
+    gap: var(--size-1);
+}
+.horizontal-row > input {
+    width: 0;
+    flex-grow: 1;
 }
 
 /*-----------------------------------------------------------------------------

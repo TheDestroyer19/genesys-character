@@ -18,14 +18,20 @@ impl World {
         let mut elements = HashMap::new();
 
         let id = Id::new();
-        elements.insert(id, Entity {
+        elements.insert(
             id,
-            name: "Unnamed Character".into(),
-            description: "".into(),
-            character: Some(Box::new(Character::default())),
-        });
+            Entity {
+                id,
+                name: "Unnamed Character".into(),
+                description: "".into(),
+                character: Some(Box::new(Character::default())),
+            },
+        );
 
-        Self { elements, character_id: id }
+        Self {
+            elements,
+            character_id: id,
+        }
     }
 
     pub fn create(&mut self) -> Entity {

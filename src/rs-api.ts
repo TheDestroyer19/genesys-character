@@ -62,6 +62,14 @@ export async function DeleteEntity(id: Id) {
     await invoke('delete_entity', { id: id });
 }
 
+export async function GetCharacter(): Promise<Entity> {
+    return await invoke('get_character');
+}
+
+export async function EditCharacter() {
+    await invoke('edit_character');
+}
+
 export async function ListenForEntityCreated(callback: EventCallback<Entity>): Promise<UnlistenFn> {
     return await listen('entity-created', callback);
 }

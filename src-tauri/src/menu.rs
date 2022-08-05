@@ -1,6 +1,8 @@
 use log::{info, warn};
 use tauri::{CustomMenuItem, Menu, MenuItem, Submenu, WindowMenuEvent};
 
+use crate::window::Window;
+
 pub fn build() -> Menu {
     let file = Submenu::new(
         "File",
@@ -34,7 +36,7 @@ pub fn on_menu_event(event: WindowMenuEvent) {
             window.close().unwrap();
         }
         "view-character" => {
-            crate::window::open_or_focus_character(window).unwrap();
+            crate::window::Character.open_or_focus(window).unwrap();
         }
         other => warn!("Unhandled menu event id: {}", other),
     };
